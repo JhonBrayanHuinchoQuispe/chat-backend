@@ -12,7 +12,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-lima_tz = pytz.timezone('America/Lima')
+peru_tz = pytz.timezone('America/Lima')
 
 # Configuración de Pusher para tiempo real
 pusher_client = None
@@ -70,8 +70,8 @@ def send_message():
     connection.close()
     
     utc_time = timestamp_result[0].replace(tzinfo=pytz.UTC)
-    lima_time = utc_time.astimezone(lima_tz)
-    formatted_timestamp = lima_time.strftime('%Y-%m-%d %H:%M:%S')
+    peru_time = utc_time.astimezone(peru_tz)
+    formatted_timestamp = peru_time.strftime('%Y-%m-%d %H:%M:%S')
     
     # Envío en tiempo real con Pusher
     message_data = {
@@ -97,8 +97,8 @@ def get_messages():
     for mensaje in mensajes:
         if mensaje['timestamp']:
             utc_time = mensaje['timestamp'].replace(tzinfo=pytz.UTC)
-            lima_time = utc_time.astimezone(lima_tz)
-            mensaje['timestamp'] = lima_time.strftime('%H:%M')
+            peru_time = utc_time.astimezone(peru_tz)
+            mensaje['timestamp'] = peru_time.strftime('%I:%M %p')
     
     cursor.close()
     connection.close()
