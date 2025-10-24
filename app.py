@@ -7,7 +7,8 @@ from datetime import datetime
 import pytz
 
 app = Flask(__name__)
-CORS(app)
+# Configuro CORS para permitir requests desde Vercel
+CORS(app, origins=['*'], methods=['GET', 'POST'], allow_headers=['Content-Type'])
 
 lima_tz = pytz.timezone('America/Lima')
 
