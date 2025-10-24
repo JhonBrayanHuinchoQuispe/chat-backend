@@ -2,10 +2,12 @@
 
 
 ###  Base de Datos
+```sql
+-- Usar la base de datos
+USE sistemasic_chat_python;
 
-
-
-CREATE TABLE  mensajes (
+-- Crear tabla de mensajes
+CREATE TABLE IF NOT EXISTS mensajes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario VARCHAR(100) NOT NULL,
     mensaje TEXT NOT NULL,
@@ -25,6 +27,11 @@ SELECT
 FROM mensajes 
 ORDER BY timestamp DESC 
 LIMIT 50;
+
+-- Insertar mensajes de ejemplo
+INSERT INTO mensajes (usuario, mensaje) VALUES 
+('Sistema', 'Bienvenido al chat de SistemasSIC'),
+('Admin', 'Chat iniciado correctamente');
 
 -- Crear índices
 CREATE INDEX idx_timestamp ON mensajes(timestamp DESC);
