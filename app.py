@@ -45,13 +45,14 @@ else:
     print("⚠️  Pusher no configurado - usando modo polling. Configura las variables de entorno PUSHER_APP_ID, PUSHER_KEY y PUSHER_SECRET")
 
 def get_db_connection():
-    """Función para conectar a la base de datos MySQL en Railway"""
+    """Función para conectar a la base de datos MySQL"""
     try:
         connection = mysql.connector.connect(
-            host='mysql-sistemasic.alwaysdata.net',
-            database='sistemasic_chat',
-            user='436286',
-            password='brayan933783039',
+            host=os.environ.get('DB_HOST', 'mysql-sistemasic.alwaysdata.net'),
+            database=os.environ.get('DB_NAME', 'sistemasic_chat-python'),
+            user=os.environ.get('DB_USER', '436286'),
+            password=os.environ.get('DB_PASS', 'brayan933783039'),
+            port=int(os.environ.get('DB_PORT', '3306')),
             charset='utf8mb4',
             collation='utf8mb4_unicode_ci'
         )
