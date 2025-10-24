@@ -3,7 +3,6 @@
 
 ###  Base de Datos
 ```sql
--- Usar la base de datos
 USE sistemasic_chat_python;
 
 -- Crear tabla de mensajes
@@ -16,7 +15,6 @@ CREATE TABLE IF NOT EXISTS mensajes (
     user_agent TEXT
 );
 
--- Crear vista de mensajes recientes
 CREATE OR REPLACE VIEW mensajes_recientes AS
 SELECT 
     id,
@@ -27,11 +25,6 @@ SELECT
 FROM mensajes 
 ORDER BY timestamp DESC 
 LIMIT 50;
-
--- Insertar mensajes de ejemplo
-INSERT INTO mensajes (usuario, mensaje) VALUES 
-('Sistema', 'Bienvenido al chat de SistemasSIC'),
-('Admin', 'Chat iniciado correctamente');
 
 -- Crear índices
 CREATE INDEX idx_timestamp ON mensajes(timestamp DESC);
