@@ -49,7 +49,7 @@ def get_db_connection():
     try:
         connection = mysql.connector.connect(
             host=os.environ.get('DB_HOST', 'mysql-sistemasic.alwaysdata.net'),
-            database=os.environ.get('DB_NAME', 'sistemasic_chat'),
+            database=os.environ.get('DB_NAME', 'sistemasic_chat-python'),
             user=os.environ.get('DB_USER', '436286'),
             password=os.environ.get('DB_PASS', 'brayan933783039'),
             port=int(os.environ.get('DB_PORT', '3306')),
@@ -192,6 +192,29 @@ def pusher_authentication():
         
     except Exception as e:
         return jsonify({'error': f'Error de autenticación: {str(e)}'}), 500
+
+@app.route('/api/clear-messages', methods=['POST'])
+def clear_messages():
+    """Endpoint para limpiar todos los mensajes"""
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+        
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM mensajes")
+        connection.commit()
+        
+        deleted_count = cursor.rowcount
+        cursor.close()
+        connection.close()
+        
+        return jsonify({'success': True, 'deleted_count': deleted_count}), 200
+        
+    except Error as e:
+        return jsonify({'error': f'Error al eliminar mensajes: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error interno: {str(e)}'}), 500
 
 @app.route('/health', methods=['GET'])
 def health_check():
