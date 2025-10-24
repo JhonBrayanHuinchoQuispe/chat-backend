@@ -132,32 +132,33 @@ def send_message():
 
 @app.route('/api/messages', methods=['GET'])
 def get_messages():
-    """Endpoint para obtener mensajes"""
+    """Endpoint para obtener mensajes (optimizado)"""
     try:
         connection = get_db_connection()
         if not connection:
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
         
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT usuario, mensaje, timestamp FROM mensajes ORDER BY timestamp DESC LIMIT 50"
+        # Optimizado: menos mensajes para carga más rápida
+        query = "SELECT usuario, mensaje, timestamp FROM mensajes ORDER BY timestamp ASC LIMIT 30"
         cursor.execute(query)
         mensajes = cursor.fetchall()
         
-        # Convertir timestamps a string para JSON
+        # Convertir timestamps a string para JSON (optimizado)
         for mensaje in mensajes:
             if mensaje['timestamp']:
                 # Convertir a zona horaria de Lima
-                utc_time = mensaje['timestamp'].replace(tzinfo=pytz.UTC)
-                lima_time = utc_time.astimezone(lima_tz)
-                mensaje['timestamp'] = lima_time.strftime('%Y-%m-%d %H:%M:%S')
+                if hasattr(mensaje['timestamp'], 'replace'):
+                    utc_time = mensaje['timestamp'].replace(tzinfo=pytz.UTC)
+                    lima_time = utc_time.astimezone(lima_tz)
+                    mensaje['timestamp'] = lima_time.strftime('%H:%M')  # Solo hora y minutos
+                else:
+                    mensaje['timestamp'] = str(mensaje['timestamp'])
         
         cursor.close()
         connection.close()
         
-        # Invertir el orden para mostrar los más antiguos primero
-        mensajes_ordenados = list(reversed(mensajes))
-        
-        return jsonify({'messages': mensajes_ordenados}), 200
+        return jsonify({'messages': mensajes}), 200
         
     except Error as e:
         return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
@@ -209,12 +210,14 @@ def clear_messages():
         cursor.close()
         connection.close()
         
-        return jsonify({'success': True, 'deleted_count': deleted_count}), 200
+        return jsonify({
+            'success': True, 
+            'message': f'Se eliminaron {deleted_count} mensajes',
+            'deleted_count': deleted_count
+        }), 200
         
     except Error as e:
-        return jsonify({'error': f'Error al eliminar mensajes: {str(e)}'}), 500
-    except Exception as e:
-        return jsonify({'error': f'Error interno: {str(e)}'}), 500
+        return jsonify({'error': f'Error al eliminar mensajes: {e}'}), 500
 
 @app.route('/health', methods=['GET'])
 def health_check():
