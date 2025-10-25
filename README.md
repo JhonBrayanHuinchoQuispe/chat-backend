@@ -30,11 +30,3 @@ LIMIT 50;
 CREATE INDEX idx_timestamp ON mensajes(timestamp DESC);
 CREATE INDEX idx_usuario ON mensajes(usuario);
 ```
-
-
-## 📝 Notas
-
-- El chat funciona con o sin Pusher
-- Si Pusher no está disponible, usa polling cada 3 segundos
-- La zona horaria está configurada para Lima, Perú
-- Los mensajes se almacenan en MySQL con charset utf8mb4
