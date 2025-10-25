@@ -54,11 +54,12 @@ def send_message():
     data = request.get_json()
     usuario = data.get('usuario', '').strip()
     mensaje = data.get('mensaje', '').strip()
+    tipo_usuario = data.get('tipo_usuario', 'cliente')  # cliente o admin
     
     connection = get_db_connection()
     cursor = connection.cursor()
-    query = "INSERT INTO mensajes (usuario, mensaje) VALUES (%s, %s)"
-    cursor.execute(query, (usuario, mensaje))
+    query = "INSERT INTO mensajes (usuario, mensaje, tipo_usuario) VALUES (%s, %s, %s)"
+    cursor.execute(query, (usuario, mensaje, tipo_usuario))
     connection.commit()
     
     message_id = cursor.lastrowid
@@ -78,7 +79,8 @@ def send_message():
         'id': message_id,
         'usuario': usuario,
         'mensaje': mensaje,
-        'timestamp': formatted_timestamp
+        'timestamp': formatted_timestamp,
+        'tipo_usuario': tipo_usuario
     }
     
     if pusher_enabled and pusher_client:
@@ -90,7 +92,7 @@ def send_message():
 def get_messages():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    query = "SELECT usuario, mensaje, timestamp FROM mensajes ORDER BY timestamp ASC LIMIT 30"
+    query = "SELECT usuario, mensaje, timestamp, tipo_usuario FROM mensajes ORDER BY timestamp ASC LIMIT 30"
     cursor.execute(query)
     mensajes = cursor.fetchall()
     
@@ -99,6 +101,9 @@ def get_messages():
             utc_time = mensaje['timestamp'].replace(tzinfo=pytz.UTC)
             peru_time = utc_time.astimezone(peru_tz)
             mensaje['timestamp'] = peru_time.strftime('%I:%M %p')
+        # Asegurar que tipo_usuario tenga un valor por defecto
+        if not mensaje.get('tipo_usuario'):
+            mensaje['tipo_usuario'] = 'cliente'
     
     cursor.close()
     connection.close()
